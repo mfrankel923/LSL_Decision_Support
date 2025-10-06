@@ -48,8 +48,6 @@ project_areas_points = project_areas.copy()
 
 # Convert from polygons to points
 project_areas_points['geometry'] = project_areas_points.geometry.centroid
-# Quick diagnostic plot of project areas colored by 'Group'.
-project_areas_points.plot(column='Group')
 
 # Add the x and y coordinates of the centroid as attributes
 project_areas_points['x_cord']=project_areas_points.loc[:,'geometry'].x
@@ -173,11 +171,11 @@ print('optimizing')
 
 algorithm.run(100000)
 for solution in unique(nondominated(algorithm.result)):
-    print(solution.variables, solution.objectives)
+    # print(solution.variables, solution.objectives)
     objectives.append(list(solution.objectives))
     variables.append([solution.variables[0]])
 
-print(len(objectives))
+# print(len(objectives))
 
 #Convert objectives into an array
 objectives = np.array(objectives)
@@ -207,10 +205,6 @@ objs_std[3,:]=standardize(objectives[:,3]).flatten()
 objs_std[1,:]= .5 - (objs_std[1,:] - .5)
 objs_std[3,:]= .5 - (objs_std[3,:] - .5)
 
-plt.figure()
-plt.plot(objs_std)
-plt.xticks([0,1,2,3],['90 Percentile','Distance','U5','Income'])
-
 
 #%% Only do this once!
 # Reorder standardized objectives for consistent panel ordering in plots
@@ -232,14 +226,11 @@ objs_std = objs_std_adjust
 # Create list to store silhouette scores
 sil_score = [] 
 for i in range(2,10):
-    print(i)
+    #print(i)
     kmed = KMedoids(n_clusters=i, random_state=0).fit(objs_std.transpose())
     sil_score.append(silhouette_score(objs_std.transpose(),kmed.labels_))
 sil_score = np.array(sil_score)
 clust_opt = np.where(sil_score==np.max(sil_score))[0][0]+2    
-
-plt.figure()
-plt.plot(sil_score)
 
 kmed = KMedoids(n_clusters=clust_opt, random_state=0).fit(objs_std.transpose())
 
@@ -290,5 +281,16 @@ for spine in ['top','bottom','left','right']:
         ax.spines[spine].set_visible(False)
 
 fig.savefig('fig8_parallel_plot_clusters.tiff',bbox_inches = "tight",dpi=1000)
+
+# Save year for each strategy to shapefile
+# Already executed in shapefile save on github, no need to re-execute here
+# Because random seed is set, results are the same and no need to save to shapefile again
+
+#for i in range(len(inds_center)):
+#    project_areas['Yr_Strat'+str(i+1)] = np.ceil(np.array(variables_all[inds_center[i]][0])/8)
+    
+#project_areas.to_file('Project_Areas_with_Attributes.shp')
+
+
 
 
