@@ -165,7 +165,7 @@ objectives = []
 variables = []
 
 # Set a random seed for reproducibility of the evolutionary algorithm
-random.seed(10)
+random.seed(11)
 
 print('optimizing')
 
@@ -281,6 +281,15 @@ for spine in ['top','bottom','left','right']:
         ax.spines[spine].set_visible(False)
 
 fig.savefig('fig8_parallel_plot_clusters.tiff',bbox_inches = "tight",dpi=1000)
+
+#%%
+
+year_matrix = np.zeros((4,80))
+for i in range(4):
+    sol = variables[inds_center[i]][0]
+    for j in range(80):
+        year_matrix[i,j]=int(sol.index(j)//8) 
+
 
 # Save year for each strategy to shapefile
 # Already executed in shapefile save on github, no need to re-execute here
